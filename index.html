@@ -52,18 +52,27 @@
         a:hover { color: var(--gold-bright); }
 
         /* -- Hero -- */
+        .hero-fixed-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: url('hero.jpg') center 20% / cover no-repeat;
+            z-index: 0;
+        }
+
         .hero {
             position: relative;
             height: 100vh;
-            background: url('hero.jpg') center 20% / cover no-repeat fixed;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1;
         }
 
         .hero-title {
             position: relative;
-            z-index: 2;
             text-align: center;
         }
 
@@ -459,14 +468,11 @@
                 font-size: 0.75rem;
             }
 
-            .hero {
-                height: 70vh;
-                background-attachment: scroll;
-            }
+            .hero { height: 70vh; }
 
-            .hero-title h1 {
-                font-size: 2.8rem;
-            }
+            .hero-fixed-bg { height: 70vh; }
+
+            .hero-title h1 { font-size: 2.8rem; }
 
             .hero h1 { font-size: 2.2rem; }
 
@@ -482,7 +488,10 @@
 </head>
 <body>
 
-<!-- Hero — image with title overlay -->
+<!-- Fixed background image — stays locked while page scrolls -->
+<div class="hero-fixed-bg"></div>
+
+<!-- Hero spacer with title overlay -->
 <section class="hero">
     <div class="hero-title">
         <h1>Alice DM</h1>

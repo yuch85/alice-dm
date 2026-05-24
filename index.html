@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alice DM — Your AI Game Master</title>
+    <meta name="description" content="An AI-powered D&D Game Master that runs full campaigns over chat. Async play, living worlds, AI-generated visuals, and multi-campaign support.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* -- Design System -- */
+        :root {
+            --bg-deep: #0d0f14;
+            --bg-surface: #111520;
+            --bg-card: #151820;
+            --bg-card-hover: #1a1f2a;
+            --border: #2a2f3a;
+            --gold: #c9a84c;
+            --gold-dim: #a07d2e;
+            --gold-bright: #e8c65a;
+            --text: #d4d0c8;
+            --text-dim: #8a8679;
+            --text-bright: #f0ece0;
+            --accent-blue: #4a7c9b;
+            --accent-green: #4a9b6a;
+            --accent-red: #9b4a4a;
+            --accent-purple: #7b5ea7;
+            --nav-bg: #10131a;
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Crimson Text", Georgia, serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: "Cinzel", serif;
+            color: var(--gold);
+            letter-spacing: 0.06em;
+        }
+
+        a { color: var(--gold); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--gold-bright); }
+
+        /* -- Hero -- */
+        .hero {
+            position: relative;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('hero.jpg') center 20% / cover no-repeat;
+            filter: brightness(0.35) saturate(0.8);
+            transform: scale(1.02);
+        }
+
+        .hero-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(13,15,20,0.3) 0%,
+                rgba(13,15,20,0.5) 40%,
+                rgba(13,15,20,0.85) 75%,
+                var(--bg-deep) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem 1.5rem;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            font-family: "Cinzel", serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            border: 1px solid var(--gold-dim);
+            border-radius: 4px;
+            padding: 0.3rem 1rem;
+            margin-bottom: 1.5rem;
+            background: rgba(201, 168, 76, 0.08);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 7vw, 4.5rem);
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            line-height: 1.1;
+            text-shadow: 0 4px 30px rgba(201, 168, 76, 0.25);
+            margin-bottom: 1rem;
+        }
+
+        .hero-sub {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: var(--text);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-tagline {
+            font-size: 1rem;
+            color: var(--text-dim);
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            font-family: "Cinzel", serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--bg-deep);
+            background: var(--gold);
+            border: none;
+            border-radius: 4px;
+            padding: 0.85rem 2.5rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
+        }
+
+        .hero-cta:hover {
+            background: var(--gold-bright);
+            color: var(--bg-deep);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 30px rgba(201, 168, 76, 0.4);
+        }
+
+        /* -- Nav -- */
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            background: var(--nav-bg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-link {
+            font-family: "Cinzel", serif;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 1rem 2.5rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--text);
+            background: rgba(201, 168, 76, 0.04);
+        }
+
+        .nav-link.active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+            text-shadow: 0 0 8px rgba(201, 168, 76, 0.2);
+        }
+
+        /* -- Page Content -- */
+        .page-content {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 6rem;
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* -- Section -- */
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section-heading {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+        }
+
+        .section-intro {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 2rem;
+            max-width: 700px;
+            line-height: 1.8;
+        }
+
+        /* -- Feature Cards -- */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: background 0.2s, border-color 0.3s, transform 0.2s;
+        }
+
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--gold-dim);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        /* -- Spotlight (large feature) -- */
+        .spotlight {
+            background: var(--bg-card);
+            border: 1px solid var(--gold-dim);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spotlight::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--gold) 30%,
+                var(--gold-bright) 50%,
+                var(--gold) 70%,
+                transparent 100%
+            );
+        }
+
+        .spotlight-badge {
+            display: inline-block;
+            font-family: "Cinzel", serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: rgba(201, 168, 76, 0.12);
+            border: 1px solid var(--gold-dim);
+            border-radius: 4px;
+            padding: 0.2rem 0.8rem;
+            margin-bottom: 1rem;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 4px rgba(201, 168, 76, 0.2); }
+            50% { box-shadow: 0 0 16px rgba(201, 168, 76, 0.4); }
+        }
+
+        .spotlight h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .spotlight p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text);
+            max-width: 700px;
+        }
+
+        .spotlight .subtext {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+
+        /* -- Callout list -- */
+        .callout-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 1.5rem;
+        }
+
+        .callout-list li {
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            position: relative;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .callout-list li::before {
+            content: "\2726";
+            position: absolute;
+            left: 0;
+            color: var(--gold-dim);
+            font-size: 0.75rem;
+            top: 0.65rem;
+        }
+
+        /* -- Architecture Tab -- */
+        .arch-section {
+            margin-bottom: 3.5rem;
+        }
+
+        .arch-heading {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.75rem;
+            color: var(--gold);
+        }
+
+        .arch-text {
+            font-size: 1rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .arch-text strong {
+            color: var(--text-bright);
+        }
+
+        .arch-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--gold-dim);
+            border-radius: 0 8px 8px 0;
+            padding: 1.25rem 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .arch-block h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .arch-block p, .arch-block ul {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            line-height: 1.7;
+        }
+
+        .arch-block ul {
+            padding-left: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .arch-block ul li {
+            margin-bottom: 0.3rem;
+        }
+
+        .arch-diagram {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: "Courier New", monospace;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .arch-chip {
+            display: inline-block;
+            font-family: "Cinzel", serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.15rem 0.6rem;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .chip-required {
+            color: var(--accent-red);
+            background: rgba(155, 74, 74, 0.15);
+            border: 1px solid var(--accent-red);
+        }
+
+        .chip-recommended {
+            color: var(--accent-blue);
+            background: rgba(74, 124, 155, 0.15);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .chip-optional {
+            color: var(--accent-green);
+            background: rgba(74, 155, 106, 0.15);
+            border: 1px solid var(--accent-green);
+        }
+
+        /* -- Divider -- */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .section-divider::after {
+            content: "\2726";
+            position: absolute;
+            top: -0.55rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-deep);
+            padding: 0 0.8rem;
+            color: var(--gold-dim);
+            font-size: 0.8rem;
+        }
+
+        /* -- Footer -- */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        footer a { color: var(--gold-dim); }
+
+        /* -- Responsive -- */
+        @media (max-width: 640px) {
+            .nav-link {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.75rem;
+            }
+
+            .hero { min-height: 70vh; }
+
+            .hero h1 { font-size: 2.2rem; }
+
+            .page-content { padding: 2rem 1rem 4rem; }
+
+            .feature-grid { grid-template-columns: 1fr; }
+
+            .spotlight { padding: 1.5rem; }
+
+            .arch-diagram { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+        <span class="hero-badge">AI-Powered Tabletop</span>
+        <h1>Alice DM</h1>
+        <p class="hero-sub">A full D&D Game Master that lives in your group chat. AI-generated maps, portraits, and cinematics. Persistent worlds that remember everything. Play on your schedule.</p>
+        <p class="hero-tagline">Because the hardest part of D&D was never the rules. It was getting everyone in the same room.</p>
+        <a href="#features" class="hero-cta" onclick="switchTab('features')">Explore Features</a>
+    </div>
+</section>
+
+<!-- Nav -->
+<nav class="nav-bar" id="nav">
+    <button class="nav-link active" onclick="switchTab('features')">Features</button>
+    <button class="nav-link" onclick="switchTab('architecture')">Architecture</button>
+</nav>
+
+<!-- Features Tab -->
+<div class="tab-panel active" id="tab-features">
+<div class="page-content">
+
+    <!-- Mandate Mode Spotlight -->
+    <div class="spotlight section">
+        <span class="spotlight-badge">Signature Feature</span>
+        <h2>Mandate Mode</h2>
+        <p>Life doesn't pause for initiative order. Mandate Mode lets busy players delegate their character to the AI when they can't make a session. Set a persona, define hard escalation triggers (never accept a betrayal, never surrender below 30% HP), and the DM plays your character in-voice until you're back.</p>
+        <p class="subtext">Your party keeps moving. You catch up on the recap. Nobody waits three weeks for a scheduling miracle.</p>
+        <ul class="callout-list">
+            <li>Freeform persona guidance &mdash; "Cat fights dirty, retreats when outnumbered, always checks exits first"</li>
+            <li>Hard escalation triggers pause auto-play and hand control back to the human</li>
+            <li>Full action log so you never miss what your character did</li>
+            <li>Works for combat, dialogue, and exploration &mdash; not just fights</li>
+        </ul>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Living World -->
+    <div class="section">
+        <h2 class="section-heading">Living Worlds</h2>
+        <p class="section-intro">Every NPC, location, faction, and quest lives in persistent state. The world evolves during play &mdash; new characters are written into the world the moment they appear, not after the session. Nothing is forgotten.</p>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f30d;</span>
+                <h3>Persistent State</h3>
+                <p>Campaign state persists across sessions with tiered knowledge: working memory compresses into episode summaries, plot logs, and permanent canon. The world has a long memory.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f4dc;</span>
+                <h3>Immediate World Evolution</h3>
+                <p>Improvised NPCs, discovered locations, and faction shifts are written to the world instantly. No "I'll add that later" &mdash; the world updates in real time.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f504;</span>
+                <h3>Supersession Chains</h3>
+                <p>When a plot twist rewrites history, old facts aren't deleted &mdash; they're marked stale with a narrative arc. The world remembers what it used to believe.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f5fa;</span>
+                <h3>Reusable Universes</h3>
+                <p>Settings are portable. Run multiple campaigns in the same universe simultaneously. Campaign-specific additions layer on top without corrupting shared lore.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Campaign Hub -->
+    <div class="section">
+        <h2 class="section-heading">Campaign Hub</h2>
+        <p class="section-intro">Every campaign gets a living web page &mdash; a single URL your players bookmark. Interactive maps with clickable location pins, character sheets with live HP bars and spell slots, and quest trackers that update as the story unfolds.</p>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f5fa;</span>
+                <h3>Interactive Maps</h3>
+                <p>AI-generated maps with CSS-positioned clickable pins. Hover for a blurb, click for full lore. Locations unlock progressively as players discover them.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f9d9;</span>
+                <h3>Live Character Sheets</h3>
+                <p>HP bars, spell slot trackers, inventory grids, ability tooltips, and equipment loadouts &mdash; all interactive, all live. Level-up choices happen on the page.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x2694;</span>
+                <h3>Quest Tracker</h3>
+                <p>Active quests, open threads, completed arcs &mdash; displayed with status chips and decision summaries. Players always know what's on the table.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f513;</span>
+                <h3>Progressive Reveal</h3>
+                <p>Players only see what they've discovered. The DM's vault of pre-rendered assets, hidden NPCs, and unrevealed locations stays behind the curtain until the story calls for it.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- AI Visuals -->
+    <div class="section">
+        <h2 class="section-heading">AI-Generated Visuals</h2>
+        <p class="section-intro">Every campaign comes alive with AI-generated portraits, maps, ambient scenes, and full video cinematics. The DM doesn't just describe the dragon &mdash; you see it.</p>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f3a8;</span>
+                <h3>Character Portraits</h3>
+                <p>AI-generated portraits for every NPC and PC. The first image becomes the canonical anchor &mdash; all later visuals derive from it for facial and stylistic consistency across the campaign.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f3ac;</span>
+                <h3>Cinematic Videos</h3>
+                <p>Image-to-video generation for ambient scenes and talking-NPC dialogue clips with native speech synthesis. Subtitles hardcoded. Multi-speaker support for ensemble scenes.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f399;</span>
+                <h3>Character Voices</h3>
+                <p>Zero-shot voice cloning gives every NPC a consistent voice. Voice notes, dialogue overlays on ambient video, and per-character post-processing presets for atmosphere.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f3b5;</span>
+                <h3>Ambient Audio</h3>
+                <p>Location-specific ambient soundscapes &mdash; rain on neon streets, coral chamber echoes, jungle canopy. Looping audio embedded in the campaign hub with play/pause controls.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Collateral Vault -->
+    <div class="section">
+        <h2 class="section-heading">DM's Vault</h2>
+        <p class="section-intro">Pre-render your world before the session starts. The collateral vault is a DM-only asset manifest &mdash; portraits, scene stills, dialogue clips, and voice files indexed by subject and type. The system checks the vault before generating anything new, maintaining visual consistency across months of play.</p>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f4be;</span>
+                <h3>Reuse Before Generate</h3>
+                <p>Every generation request checks the manifest first. The anchor image for a character locks their appearance &mdash; all later visuals derive from that reference.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f319;</span>
+                <h3>Overnight Batch Rendering</h3>
+                <p>Queue up NPC portraits, location establishing shots, and dialogue clips. The batch generator runs idempotently, one GPU operation at a time, resumable if interrupted.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Async Play -->
+    <div class="section">
+        <h2 class="section-heading">Play-by-Post, Perfected</h2>
+        <p class="section-intro">Designed from the ground up for asynchronous play over chat. No voice calls, no scheduling nightmares, no "sorry I can't make Tuesday." Open the group chat, play your turn, close the app. The DM is always ready.</p>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f4f1;</span>
+                <h3>Self-Contained Turns</h3>
+                <p>Every DM response is a complete beat: narration, consequence, NPC reaction, and action prompt in one message. No splitting across posts, no "continued in next message."</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x23e9;</span>
+                <h3>Smart Pacing</h3>
+                <p>Low-stakes travel and downtime compress into montage. High-stakes encounters expand into detailed turn-by-turn play. The DM reads the room and adjusts.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f3b2;</span>
+                <h3>Auditable Dice</h3>
+                <p>Every roll is logged with modifier breakdowns. No fudging, no ambiguity. The dice decide, and you can verify.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f4cb;</span>
+                <h3>Session Recaps</h3>
+                <p>Missed a week? The DM generates a published recap card at session end. Permanent URL, always accessible. Pick up exactly where the party left off.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Multi-Campaign -->
+    <div class="section">
+        <h2 class="section-heading">Multi-Campaign Engine</h2>
+        <p class="section-intro">Run five campaigns in parallel across different group chats. Each campaign gets its own DM instance, routed by a relay that maps chat IDs to campaign sessions. One player can run multiple characters across campaigns. The same universe can host concurrent parties.</p>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f500;</span>
+                <h3>Relay Router</h3>
+                <p>A lightweight routing layer sits between your chat platform and DM instances. Messages arrive at the right campaign automatically, based on which group chat they came from.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f3af;</span>
+                <h3>Owner Dispatch</h3>
+                <p>The DM operator can inject instructions into any active campaign &mdash; world events, NPC direction, pacing adjustments &mdash; without being in the player chat.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Rules -->
+    <div class="section">
+        <h2 class="section-heading">Pluggable Rulesets</h2>
+        <p class="section-intro">Not locked to D&D 5e. The ruleset system is a single reference document per game system. Ship with 5e? Sure. Want Everyday Heroes for a modern-action campaign? Drop in the ruleset file and go. Homebrew? Write one document, no code changes needed.</p>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f4d6;</span>
+                <h3>Selection Hierarchy</h3>
+                <p>Rulesets resolve from character to campaign to universe to default. A single party member can use different rules than the rest if the story demands it.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#x1f6e0;</span>
+                <h3>Zero Code Changes</h3>
+                <p>Adding a new game system is one reference document. No schema migrations, no plugin architecture. The DM reads the rules the same way a human would.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<!-- Architecture Tab -->
+<div class="tab-panel" id="tab-architecture">
+<div class="page-content">
+
+    <div class="section">
+        <h2 class="section-heading">Architecture Overview</h2>
+        <p class="section-intro">This page describes what you need to build, not how we built ours. The system is agent-agnostic &mdash; any AI coding agent with tool-use capability can serve as the foundation. What matters is the infrastructure around it.</p>
+    </div>
+
+    <!-- System Diagram -->
+    <div class="arch-section">
+        <h3 class="arch-heading">System Topology</h3>
+        <div class="arch-diagram">
+                              +-----------------+
+                              |   Chat Platform  |
+                              |  (WhatsApp, etc) |
+                              +--------+--------+
+                                       |
+                                       v
+                              +--------+--------+
+                              |  Message Bridge  |
+                              |  (Chat &lt;-&gt; API)  |
+                              +--------+--------+
+                                       |
+                           +-----------+-----------+
+                           |                       |
+                    +------+------+         +------+------+
+                    | Relay Router |         |  State      |
+                    | (multi-camp) |         |  Server     |
+                    +------+------+         | (WebSocket) |
+                           |                +------+------+
+              +------------+------------+          |
+              |            |            |          |
+        +-----+----+ +----+-----+ +----+-----+    |
+        |  DM Inst  | | DM Inst  | | DM Inst  |   |
+        | Campaign A| |Campaign B| |Campaign C|   |
+        +-----+----+ +----+-----+ +----+-----+    |
+              |            |            |          |
+              +------------+------------+----------+
+                           |
+                    +------+------+
+                    |   Campaign   |
+                    | State (JSON) |
+                    +------+------+
+                           |
+              +------------+------------+
+              |            |            |
+        +-----+----+ +----+-----+ +----+-----+
+        |  Image   | |  Video   | |  Voice   |
+        |  Gen     | |  Gen     | |  Gen     |
+        +----------+ +----------+ +----------+</div>
+    </div>
+
+    <!-- Core Components -->
+    <div class="arch-section">
+        <h3 class="arch-heading">Core Components</h3>
+
+        <div class="arch-block">
+            <h4>1. Message Bridge</h4>
+            <span class="arch-chip chip-required">Required</span>
+            <p>Bidirectional adapter between your chat platform and the AI agent. Receives inbound messages, forwards them to the correct DM instance, and delivers DM responses back to the chat. Must handle media (images, audio, video) in both directions.</p>
+            <ul>
+                <li>REST API for outbound sends (text, files, media)</li>
+                <li>Webhook or polling for inbound message capture</li>
+                <li>Message storage for history search and context</li>
+                <li>Support for group chats with sender identification</li>
+            </ul>
+        </div>
+
+        <div class="arch-block">
+            <h4>2. Campaign State Engine</h4>
+            <span class="arch-chip chip-required">Required</span>
+            <p>Persistent, structured storage for all campaign data. Flat files (JSON) work fine at typical campaign scale &mdash; version control is a feature, not a limitation. The state engine must support atomic mutations to prevent corruption during concurrent access.</p>
+            <ul>
+                <li><strong>Character data:</strong> HP, conditions, inventory, spell slots, abilities, equipment loadout</li>
+                <li><strong>World data:</strong> NPCs, locations, factions, lore entries with discovery flags</li>
+                <li><strong>Quest state:</strong> Active/completed quests, open threads, decision points</li>
+                <li><strong>Knowledge tiers:</strong> Working memory &rarr; episode summaries &rarr; plot log &rarr; canon</li>
+                <li><strong>Session metadata:</strong> Turn counter, scene state, combat tracker, last interaction timestamps</li>
+            </ul>
+        </div>
+
+        <div class="arch-block">
+            <h4>3. DM Agent Core</h4>
+            <span class="arch-chip chip-required">Required</span>
+            <p>The AI agent that serves as Game Master. Receives player messages, resolves actions against rules, mutates game state, and narrates outcomes. Must have access to: the current campaign state, the active ruleset, world data, and media generation tools.</p>
+            <ul>
+                <li>Self-contained turn generation (narration + consequence + prompt in one response)</li>
+                <li>Dice rolling with auditable logs and modifier breakdowns</li>
+                <li>Ruleset-aware action resolution (not hardcoded to one system)</li>
+                <li>Fail-forward mechanics &mdash; bad rolls create complications, not dead ends</li>
+                <li>NPC voice consistency (one trait per NPC, word choice over accents)</li>
+            </ul>
+        </div>
+
+        <div class="arch-block">
+            <h4>4. Relay Router</h4>
+            <span class="arch-chip chip-recommended">Recommended</span>
+            <p>Required only for multi-campaign support. Routes inbound messages from different chat groups to the correct DM instance. Maintains a mapping of chat IDs to campaign sessions. Should support hot-reload of routing config without restart.</p>
+            <ul>
+                <li>Chat ID &rarr; campaign &rarr; DM instance routing</li>
+                <li>Health endpoint for monitoring active routes</li>
+                <li>Owner dispatch endpoint for DM-to-campaign instructions</li>
+                <li>One-active-campaign-per-chat invariant enforcement</li>
+            </ul>
+        </div>
+
+        <div class="arch-block">
+            <h4>5. Campaign Hub (Player-Facing Web)</h4>
+            <span class="arch-chip chip-recommended">Recommended</span>
+            <p>A web page per campaign that players can bookmark. Renders campaign state into an interactive view: maps with clickable pins, character sheets, quest trackers. Must implement progressive reveal &mdash; players see only what they've discovered in-game.</p>
+            <ul>
+                <li>Three core views: Map, Quests, Party</li>
+                <li>Character sheet with HP bar, spell slots, inventory, abilities</li>
+                <li>Level-up selection UI (spell/feature choices persist to state)</li>
+                <li>WebSocket connection to state server for live updates</li>
+                <li>Permanent URLs (assets must not expire)</li>
+            </ul>
+        </div>
+
+        <div class="arch-block">
+            <h4>6. State Server</h4>
+            <span class="arch-chip chip-recommended">Recommended</span>
+            <p>WebSocket server that bridges the campaign hub to campaign state. Handles player-initiated mutations (level-up choices, spell preparation, equipment changes) with role-based access control. DM sees everything; players see only unlocked entities.</p>
+            <ul>
+                <li>Token-based authentication (short-lived player tokens, long-lived DM tokens)</li>
+                <li>Role-based view filtering on all reads</li>
+                <li>Rate limiting and connection limits</li>
+                <li>Universe merge (campaign data layers on top of shared universe data)</li>
+            </ul>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Media Pipeline -->
+    <div class="arch-section">
+        <h3 class="arch-heading">Media Generation Pipeline</h3>
+        <p class="arch-text">Visual and audio generation makes campaigns immersive, but the system must work without it. All media is optional &mdash; the DM can run a pure-text campaign. When you do add media, here's what's needed:</p>
+
+        <div class="arch-block">
+            <h4>Image Generation</h4>
+            <span class="arch-chip chip-optional">Optional</span>
+            <p>Any image generation model works. The critical architectural decision is the <strong>anchor rule</strong>: the first image generated for any character or location becomes the canonical reference. All subsequent images of that subject must derive from the anchor (via image-to-image) to maintain visual consistency.</p>
+            <ul>
+                <li>Text-to-image for initial portraits and establishing shots</li>
+                <li>Image-to-image for variations and scene-specific versions</li>
+                <li>Universe-level style prompt prepended to all generation requests</li>
+                <li>Per-campaign color theming</li>
+            </ul>
+        </div>
+
+        <div class="arch-block">
+            <h4>Video Generation</h4>
+            <span class="arch-chip chip-optional">Optional</span>
+            <p>Two modes: ambient (silent footage seeded from a still) and dialogue (talking NPCs with synthesized speech). Video should be seeded from the character or location's anchor image for visual continuity. Subtitles should be hardcoded into all clips.</p>
+        </div>
+
+        <div class="arch-block">
+            <h4>Voice Generation</h4>
+            <span class="arch-chip chip-optional">Optional</span>
+            <p>Text-to-speech with zero-shot voice cloning for NPC consistency. Each character stores a voice reference. Post-processing presets (echo, radio static, underwater distortion) add atmosphere. Voice notes can be sent directly in chat or composited over video.</p>
+        </div>
+
+        <div class="arch-block">
+            <h4>Collateral Manifest</h4>
+            <span class="arch-chip chip-recommended">Recommended</span>
+            <p>An asset index that tracks what's been generated: <code>[subject_type][subject_id][asset_kind] &rarr; file_path</code>. The DM checks this before generating anything new. Prevents duplicate generation, enforces the anchor rule, and enables batch pre-rendering.</p>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- State Design -->
+    <div class="arch-section">
+        <h3 class="arch-heading">State Architecture</h3>
+        <p class="arch-text">Campaign state is the heart of the system. Get this right and everything else is tooling around it.</p>
+
+        <div class="arch-block">
+            <h4>Knowledge Tiering</h4>
+            <span class="arch-chip chip-required">Required</span>
+            <p>Without knowledge tiering, the DM's context window fills up after a few sessions. The solution is a compression pipeline:</p>
+            <ul>
+                <li><strong>Tier 0 (Working):</strong> Raw turn-by-turn log of the current session</li>
+                <li><strong>Tier 1 (Episodes):</strong> Compressed session summaries</li>
+                <li><strong>Tier 2 (Plot Log):</strong> Major and critical events promoted from episode summaries</li>
+                <li><strong>Tier 3 (Canon):</strong> Permanent facts &mdash; world changes that can never be forgotten</li>
+            </ul>
+            <p>At session end, Tier 0 compresses into a Tier 1 episode. Important events promote upward. Old sessions drop out of active context but remain searchable.</p>
+        </div>
+
+        <div class="arch-block">
+            <h4>Consolidation Pipeline</h4>
+            <span class="arch-chip chip-required">Required</span>
+            <p>Runs at session end (and optionally on inactivity auto-save). Compresses working memory, updates character state (HP, inventory, conditions), promotes events through knowledge tiers, increments session counter, and publishes a recap.</p>
+        </div>
+
+        <div class="arch-block">
+            <h4>Progressive Reveal</h4>
+            <span class="arch-chip chip-required">Required</span>
+            <p>Every world entity (NPC, location, faction, lore) carries a visibility flag. The campaign hub and player-facing APIs filter on these flags. The DM sees everything; players see only what they've discovered. This is the core architectural constraint that enables the DM's vault.</p>
+        </div>
+
+        <div class="arch-block">
+            <h4>Deprioritization</h4>
+            <span class="arch-chip chip-recommended">Recommended</span>
+            <p>Entities not interacted with for many sessions are excluded from the DM's active context (but remain in world data). Keeps the working set small even in campaigns with hundreds of NPCs and locations.</p>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Mandate Mode -->
+    <div class="arch-section">
+        <h3 class="arch-heading">Mandate Mode Architecture</h3>
+        <p class="arch-text">Mandate Mode is an async-play feature that lets players delegate their character to AI control. The architecture is straightforward:</p>
+
+        <div class="arch-block">
+            <h4>Mandate Schema</h4>
+            <p>Each character's state includes a mandate object:</p>
+            <ul>
+                <li><strong>active:</strong> Boolean &mdash; is this character under AI control?</li>
+                <li><strong>persona:</strong> Freeform text describing how the character behaves ("fights dirty, retreats when outnumbered, always checks for exits")</li>
+                <li><strong>escalation_triggers:</strong> List of conditions that pause auto-play and return control to the human player</li>
+            </ul>
+            <p>The DM reads the persona and plays the character in-voice. When an escalation trigger fires, the DM narrates up to the decision point and waits for the human.</p>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Ruleset -->
+    <div class="arch-section">
+        <h3 class="arch-heading">Ruleset System</h3>
+        <p class="arch-text">Rulesets are reference documents, not code. The DM agent reads them the same way a human DM reads a rulebook. Adding a new game system means writing one reference document covering: core mechanics, action resolution, character progression, combat flow, and rest/recovery rules.</p>
+
+        <div class="arch-block">
+            <h4>Resolution Hierarchy</h4>
+            <p>The system checks for a ruleset at four levels: <strong>character &rarr; campaign &rarr; universe &rarr; global default</strong>. This allows mixed-system campaigns (a planar traveler using different mechanics) without special-case code.</p>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Design Principles -->
+    <div class="arch-section">
+        <h3 class="arch-heading">Design Principles</h3>
+        <p class="arch-text">These are the architectural decisions that shaped the system. They're opinionated &mdash; your build may choose differently &mdash; but they solve real problems we hit in production play.</p>
+
+        <div class="arch-block">
+            <h4>Pre-render Nouns, Not Plots</h4>
+            <p>Pre-generate NPC portraits, location maps, and ambient audio. Never pre-generate story beats or scripted sequences. Players diverge from expected paths constantly, and pre-scripted narrative is wasted work. Nouns are reusable; plots are not.</p>
+        </div>
+
+        <div class="arch-block">
+            <h4>Immediate Write</h4>
+            <p>When the DM improvises a new NPC or location, write it to world state immediately &mdash; don't defer to session-end consolidation. Deferred writes cause inconsistency when the DM references something that doesn't exist in state yet.</p>
+        </div>
+
+        <div class="arch-block">
+            <h4>JSON Over Database</h4>
+            <p>At campaign scale (hundreds of entities, not millions), version-controlled flat JSON with atomic CLI mutations beats a relational database. You get git history, easy backup, human-readable state, and no migration headaches. One writer per campaign eliminates concurrency issues.</p>
+        </div>
+
+        <div class="arch-block">
+            <h4>Channel-Keyed Routing</h4>
+            <p>One active campaign per chat group, not per player. A player can participate in multiple campaigns across different groups. The relay router maps chat IDs to campaigns, not user IDs to campaigns.</p>
+        </div>
+
+        <div class="arch-block">
+            <h4>The Anchor Rule</h4>
+            <p>The first visual generated for any character or location locks their appearance. All subsequent images derive from that anchor via image-to-image generation. This prevents the "NPC looks different every time" problem that plagues AI-generated campaigns.</p>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>Alice DM &mdash; built for the table that never meets.</p>
+</footer>
+
+<script>
+function switchTab(tab) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    const btns = document.querySelectorAll('.nav-link');
+    btns.forEach(b => {
+        if ((tab === 'features' && b.textContent.trim() === 'Features') ||
+            (tab === 'architecture' && b.textContent.trim() === 'Architecture')) {
+            b.classList.add('active');
+        }
+    });
+    if (tab === 'architecture' || tab === 'features') {
+        document.getElementById('nav').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+</script>
+
+</body>
+</html>

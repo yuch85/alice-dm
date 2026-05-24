@@ -56,6 +56,39 @@
             position: relative;
             height: 100vh;
             background: url('hero.jpg') center 20% / cover no-repeat fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-title {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero-title h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            line-height: 1;
+            color: rgba(240, 236, 224, 0.88);
+            text-shadow:
+                0 2px 20px rgba(0, 0, 0, 0.8),
+                0 4px 40px rgba(0, 0, 0, 0.6),
+                0 0 80px rgba(201, 168, 76, 0.15);
+        }
+
+        .hero-title .hero-sub-label {
+            font-family: "Cinzel", serif;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(201, 168, 76, 0.7);
+            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
+            margin-top: 0.75rem;
         }
 
         .scroll-body {
@@ -66,41 +99,16 @@
 
         .title-banner {
             text-align: center;
-            padding: 4rem 1.5rem 3rem;
+            padding: 3.5rem 1.5rem 2.5rem;
             border-bottom: 1px solid var(--border);
-        }
-
-        .title-badge {
-            display: inline-block;
-            font-family: "Cinzel", serif;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--gold);
-            border: 1px solid var(--gold-dim);
-            border-radius: 4px;
-            padding: 0.3rem 1rem;
-            margin-bottom: 1.5rem;
-            background: rgba(201, 168, 76, 0.08);
-        }
-
-        .title-banner h1 {
-            font-size: clamp(2.5rem, 7vw, 4rem);
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            line-height: 1.1;
-            text-shadow: 0 4px 30px rgba(201, 168, 76, 0.25);
-            margin-bottom: 1rem;
         }
 
         .title-sub {
             font-size: clamp(1.05rem, 2.5vw, 1.3rem);
             color: var(--text);
-            max-width: 600px;
+            max-width: 620px;
             margin: 0 auto 1.5rem;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
         .title-tagline {
@@ -452,8 +460,12 @@
             }
 
             .hero {
-                height: 60vh;
+                height: 70vh;
                 background-attachment: scroll;
+            }
+
+            .hero-title h1 {
+                font-size: 2.8rem;
             }
 
             .hero h1 { font-size: 2.2rem; }
@@ -470,16 +482,19 @@
 </head>
 <body>
 
-<!-- Hero — clean image, no text -->
-<section class="hero"></section>
+<!-- Hero — image with title overlay -->
+<section class="hero">
+    <div class="hero-title">
+        <h1>Alice DM</h1>
+        <p class="hero-sub-label">AI-Powered Game Master</p>
+    </div>
+</section>
 
 <!-- Everything below scrolls over the fixed hero image -->
 <div class="scroll-body">
 
 <!-- Title Banner -->
 <div class="title-banner">
-    <span class="title-badge">AI-Powered Tabletop</span>
-    <h1>Alice DM</h1>
     <p class="title-sub">A full D&D Game Master that lives in your group chat. AI-generated maps, portraits, and cinematics. Persistent worlds that remember everything. Play on your schedule.</p>
     <p class="title-tagline">Because the hardest part of D&D was never the rules. It was getting everyone in the same room.</p>
 </div>

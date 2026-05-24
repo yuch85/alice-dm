@@ -385,18 +385,108 @@
             margin-bottom: 0.3rem;
         }
 
-        .arch-diagram {
+        .diagram {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 2rem 1.5rem;
             margin: 1.5rem 0;
-            font-family: "Courier New", monospace;
-            font-size: 0.82rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        .dia-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+            position: relative;
+        }
+
+        .dia-node {
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.6rem 1.2rem;
+            text-align: center;
+            min-width: 120px;
+            position: relative;
+        }
+
+        .dia-node-label {
+            font-family: "Cinzel", serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gold);
+            letter-spacing: 0.04em;
+        }
+
+        .dia-node-sub {
+            font-size: 0.72rem;
             color: var(--text-dim);
-            line-height: 1.5;
-            overflow-x: auto;
-            white-space: pre;
+            margin-top: 0.15rem;
+        }
+
+        .dia-node.primary {
+            border-color: var(--gold-dim);
+            background: rgba(201, 168, 76, 0.06);
+        }
+
+        .dia-node.optional {
+            border-style: dashed;
+            border-color: var(--accent-blue);
+        }
+
+        .dia-arrow {
+            display: flex;
+            justify-content: center;
+            padding: 0.4rem 0;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+
+        .dia-arrow-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-align: center;
+            padding: 0.1rem 0;
+        }
+
+        .dia-branch {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .dia-branch .dia-node {
+            min-width: 100px;
+            flex: 0 1 auto;
+        }
+
+        .dia-connector {
+            display: flex;
+            justify-content: center;
+            padding: 0.2rem 0;
+            position: relative;
+        }
+
+        .dia-connector::before {
+            content: "";
+            display: block;
+            width: 1px;
+            height: 12px;
+            background: var(--border);
+        }
+
+        .dia-hline {
+            height: 1px;
+            background: var(--border);
+            margin: 0.3rem 2rem;
+            position: relative;
         }
 
         .arch-chip {
@@ -482,7 +572,8 @@
 
             .spotlight { padding: 1.5rem; }
 
-            .arch-diagram { font-size: 0.7rem; }
+            .dia-node { min-width: 90px; padding: 0.5rem 0.8rem; }
+            .dia-branch { gap: 0.5rem; }
         }
     </style>
 </head>
@@ -727,45 +818,73 @@
     <!-- System Diagram -->
     <div class="arch-section">
         <h3 class="arch-heading">System Topology</h3>
-        <div class="arch-diagram">
-                              +-----------------+
-                              |   Chat Platform  |
-                              |  (WhatsApp, etc) |
-                              +--------+--------+
-                                       |
-                                       v
-                              +--------+--------+
-                              |  Message Bridge  |
-                              |  (Chat &lt;-&gt; API)  |
-                              +--------+--------+
-                                       |
-                           +-----------+-----------+
-                           |                       |
-                    +------+------+         +------+------+
-                    | Relay Router |         |  State      |
-                    | (multi-camp) |         |  Server     |
-                    +------+------+         | (WebSocket) |
-                           |                +------+------+
-              +------------+------------+          |
-              |            |            |          |
-        +-----+----+ +----+-----+ +----+-----+    |
-        |  DM Inst  | | DM Inst  | | DM Inst  |   |
-        | Campaign A| |Campaign B| |Campaign C|   |
-        +-----+----+ +----+-----+ +----+-----+    |
-              |            |            |          |
-              +------------+------------+----------+
-                           |
-                    +------+------+
-                    |   Campaign   |
-                    | State (JSON) |
-                    +------+------+
-                           |
-              +------------+------------+
-              |            |            |
-        +-----+----+ +----+-----+ +----+-----+
-        |  Image   | |  Video   | |  Voice   |
-        |  Gen     | |  Gen     | |  Gen     |
-        +----------+ +----------+ +----------+</div>
+        <div class="diagram">
+            <div class="dia-row">
+                <div class="dia-node primary">
+                    <div class="dia-node-label">Chat Platform</div>
+                    <div class="dia-node-sub">WhatsApp, Telegram, etc.</div>
+                </div>
+            </div>
+            <div class="dia-arrow">&#x25BC;</div>
+            <div class="dia-row">
+                <div class="dia-node primary">
+                    <div class="dia-node-label">Message Bridge</div>
+                    <div class="dia-node-sub">Chat &harr; REST API</div>
+                </div>
+            </div>
+            <div class="dia-arrow">&#x25BC;</div>
+            <div class="dia-row">
+                <div class="dia-node primary">
+                    <div class="dia-node-label">Relay Router</div>
+                    <div class="dia-node-sub">Routes by chat group</div>
+                </div>
+            </div>
+            <div class="dia-arrow">&#x25BC;</div>
+            <div class="dia-branch">
+                <div class="dia-node">
+                    <div class="dia-node-label">DM Instance</div>
+                    <div class="dia-node-sub">Campaign A</div>
+                </div>
+                <div class="dia-node">
+                    <div class="dia-node-label">DM Instance</div>
+                    <div class="dia-node-sub">Campaign B</div>
+                </div>
+                <div class="dia-node">
+                    <div class="dia-node-label">DM Instance</div>
+                    <div class="dia-node-sub">Campaign C</div>
+                </div>
+            </div>
+            <div class="dia-arrow">&#x25BC;</div>
+            <div class="dia-row" style="gap: 1.5rem;">
+                <div class="dia-node primary">
+                    <div class="dia-node-label">Campaign State</div>
+                    <div class="dia-node-sub">JSON + Knowledge Tiers</div>
+                </div>
+                <div class="dia-node">
+                    <div class="dia-node-label">State Server</div>
+                    <div class="dia-node-sub">WebSocket &rarr; Hub</div>
+                </div>
+            </div>
+            <div class="dia-arrow">&#x25BC;</div>
+            <div class="dia-branch">
+                <div class="dia-node optional">
+                    <div class="dia-node-label">Image Gen</div>
+                    <div class="dia-node-sub">Portraits &amp; Maps</div>
+                </div>
+                <div class="dia-node optional">
+                    <div class="dia-node-label">Video Gen</div>
+                    <div class="dia-node-sub">Cinematics</div>
+                </div>
+                <div class="dia-node optional">
+                    <div class="dia-node-label">Voice Gen</div>
+                    <div class="dia-node-sub">NPC Voices</div>
+                </div>
+                <div class="dia-node optional">
+                    <div class="dia-node-label">Campaign Hub</div>
+                    <div class="dia-node-sub">Player Web UI</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Core Components -->

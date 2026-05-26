@@ -807,7 +807,7 @@
 <!-- Nav -->
 <nav class="nav-bar" id="nav">
     <button class="nav-link active" onclick="switchTab('features')">Features</button>
-    <button class="nav-link" onclick="switchTab('architecture')">Architecture</button>
+    <button class="nav-link" onclick="switchTab('architecture')">Arch</button>
     <button class="nav-link" onclick="switchTab('team')">The Team</button>
 </nav>
 
@@ -1377,7 +1377,7 @@ function switchTab(tab) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
-    const labels = { features: 'Features', architecture: 'Architecture', team: 'The Team' };
+    const labels = { features: 'Features', architecture: 'Arch', team: 'The Team' };
     document.querySelectorAll('.nav-link').forEach(b => {
         if (b.textContent.trim() === labels[tab]) b.classList.add('active');
     });

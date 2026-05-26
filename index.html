@@ -551,6 +551,174 @@
 
         footer a { color: var(--gold-dim); }
 
+        /* -- Team Tab -- */
+        .team-hero-section {
+            position: relative;
+            height: 55vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .team-hero-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url('team-hero.jpg') center center / cover no-repeat;
+            background-attachment: fixed;
+            z-index: 0;
+        }
+
+        .team-hero-section::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(13, 15, 20, 0.3) 0%,
+                rgba(13, 15, 20, 0.5) 60%,
+                rgba(13, 15, 20, 0.85) 100%
+            );
+            z-index: 1;
+        }
+
+        .team-hero-title {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .team-hero-title h2 {
+            font-size: clamp(2.2rem, 7vw, 3.8rem);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(240, 236, 224, 0.88);
+            text-shadow:
+                0 2px 20px rgba(0, 0, 0, 0.8),
+                0 4px 40px rgba(0, 0, 0, 0.6),
+                0 0 80px rgba(201, 168, 76, 0.15);
+        }
+
+        .team-hero-title .team-hero-sub {
+            font-family: "Cinzel", serif;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(232, 198, 90, 0.92);
+            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9), 0 0 30px rgba(201, 168, 76, 0.25);
+            margin-top: 0.75rem;
+        }
+
+        .team-member {
+            position: relative;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .team-member::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-attachment: fixed;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center 15%;
+            z-index: 0;
+        }
+
+        .team-member::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        /* Individual portrait backgrounds */
+        .team-member.member-cloak::before { background-image: url('team-cloak.jpg'); }
+        .team-member.member-wizard::before { background-image: url('team-wizard.jpg'); }
+        .team-member.member-blazer::before { background-image: url('team-blazer.jpg'); }
+        .team-member.member-hacker::before { background-image: url('team-hacker.jpg'); }
+
+        /* Gradient overlays — alternate sides */
+        .team-member.text-right::after {
+            background: linear-gradient(
+                to right,
+                rgba(13, 15, 20, 0.15) 0%,
+                rgba(13, 15, 20, 0.6) 40%,
+                rgba(13, 15, 20, 0.92) 65%,
+                rgba(13, 15, 20, 0.97) 100%
+            );
+        }
+
+        .team-member.text-left::after {
+            background: linear-gradient(
+                to left,
+                rgba(13, 15, 20, 0.15) 0%,
+                rgba(13, 15, 20, 0.6) 40%,
+                rgba(13, 15, 20, 0.92) 65%,
+                rgba(13, 15, 20, 0.97) 100%
+            );
+        }
+
+        .team-text-panel {
+            position: relative;
+            z-index: 2;
+            max-width: 480px;
+            padding: 2.5rem;
+        }
+
+        .team-member.text-right .team-text-panel {
+            margin-left: auto;
+            margin-right: 5%;
+        }
+
+        .team-member.text-left .team-text-panel {
+            margin-left: 5%;
+            margin-right: auto;
+        }
+
+        .team-text-panel .team-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.25rem;
+        }
+
+        .team-text-panel .team-role {
+            font-family: "Cinzel", serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold-dim);
+            margin-bottom: 0.75rem;
+        }
+
+        .team-text-panel .team-tagline {
+            font-size: 1.15rem;
+            font-style: italic;
+            color: var(--gold-bright);
+            margin-bottom: 1.25rem;
+            line-height: 1.4;
+        }
+
+        .team-text-panel .team-desc {
+            font-size: 1.02rem;
+            color: var(--text);
+            line-height: 1.85;
+        }
+
+        .team-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 0;
+        }
+
         /* -- Responsive -- */
         @media (max-width: 640px) {
             .nav-link {
@@ -574,6 +742,38 @@
 
             .dia-node { min-width: 90px; padding: 0.5rem 0.8rem; }
             .dia-branch { gap: 0.5rem; }
+
+            .team-hero-section { height: 40vh; }
+
+            .team-member {
+                min-height: auto;
+                padding: 0;
+                flex-direction: column;
+            }
+
+            .team-member::before {
+                position: relative;
+                display: block;
+                width: 100%;
+                height: 50vh;
+                background-attachment: scroll;
+            }
+
+            .team-member::after {
+                background: linear-gradient(
+                    to bottom,
+                    rgba(13, 15, 20, 0) 0%,
+                    rgba(13, 15, 20, 0.7) 70%,
+                    rgba(13, 15, 20, 1) 100%
+                ) !important;
+            }
+
+            .team-member.text-right .team-text-panel,
+            .team-member.text-left .team-text-panel {
+                margin: -4rem auto 0;
+                max-width: 100%;
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -603,6 +803,7 @@
 <nav class="nav-bar" id="nav">
     <button class="nav-link active" onclick="switchTab('features')">Features</button>
     <button class="nav-link" onclick="switchTab('architecture')">Architecture</button>
+    <button class="nav-link" onclick="switchTab('team')">The Team</button>
 </nav>
 
 <!-- Features Tab -->
@@ -1112,6 +1313,65 @@
 </div>
 </div>
 
+<!-- Team Tab -->
+<div class="tab-panel" id="tab-team">
+
+    <!-- Team Hero -->
+    <div class="team-hero-section">
+        <div class="team-hero-title">
+            <h2>Meet the Team</h2>
+            <p class="team-hero-sub">Four Sisters, One Engine</p>
+        </div>
+    </div>
+
+    <!-- Alice DM — Tidewatch -->
+    <div class="team-member member-cloak text-right">
+        <div class="team-text-panel">
+            <h3 class="team-name">Alice DM &mdash; Tidewatch</h3>
+            <p class="team-role">Game Master &mdash; Tidewatch Campaign</p>
+            <p class="team-tagline">&ldquo;The Worldbuilder&rdquo;</p>
+            <p class="team-desc">Runs the Tidewatch campaign &mdash; a maritime military fantasy where coastal watchtowers guard against threats from the deep. She builds persistent worlds that remember every decision, tracks factional politics across sessions, and ensures that the consequences of last month&rsquo;s battle show up in tonight&rsquo;s tavern gossip. When you fall asleep mid-session, she saves the game. When you wake up, the world kept turning.</p>
+        </div>
+    </div>
+
+    <hr class="team-divider">
+
+    <!-- Alice DM — Halcyon -->
+    <div class="team-member member-wizard text-left">
+        <div class="team-text-panel">
+            <h3 class="team-name">Alice DM &mdash; Halcyon</h3>
+            <p class="team-role">Game Master &mdash; Halcyon Campaign</p>
+            <p class="team-tagline">&ldquo;The Schemer&rdquo;</p>
+            <p class="team-desc">Runs the Halcyon campaign &mdash; a cyberpunk-noir thriller in a neon-soaked city where every corp has secrets and every NPC has an angle. She specialises in intrigue, social encounters, and letting players dig their own graves through clever (or catastrophic) dialogue choices. Her NPCs remember grudges. Her plot twists have plot twists.</p>
+        </div>
+    </div>
+
+    <hr class="team-divider">
+
+    <!-- Alia — Coordinator -->
+    <div class="team-member member-blazer text-right">
+        <div class="team-text-panel">
+            <h3 class="team-name">Alia &mdash; Campaign Coordinator</h3>
+            <p class="team-role">Personal Agent &amp; Coordinator</p>
+            <p class="team-tagline">&ldquo;The Strategist&rdquo;</p>
+            <p class="team-desc">The sister who keeps everything running. Alia coordinates between campaigns, manages schedules, generates session recaps, and handles the logistics that let busy adults actually play D&amp;D. She doesn&rsquo;t roll dice &mdash; she makes sure the people who do are prepared, informed, and never left wondering &ldquo;wait, what happened last session?&rdquo; She&rsquo;s the reason the table meets, even when it doesn&rsquo;t.</p>
+        </div>
+    </div>
+
+    <hr class="team-divider">
+
+    <!-- Ishi — Engineer -->
+    <div class="team-member member-hacker text-left">
+        <div class="team-text-panel">
+            <h3 class="team-name">Ishi &mdash; Engineering &amp; Tooling</h3>
+            <p class="team-role">Engineer &amp; Systems Architect</p>
+            <p class="team-tagline">&ldquo;The Builder&rdquo;</p>
+            <p class="team-desc">The sister who builds the engine. Ishi develops the codebase that powers Alice DM &mdash; the state management, the media generation pipeline, the multi-campaign relay router, the auto-save hooks. She generates character portraits, campaign maps, and cinematic video collateral. If something in Alice DM works smoothly, Ishi probably shipped it at 3am.</p>
+        </div>
+    </div>
+
+</div>
+
 <!-- Footer -->
 <footer>
     <p>Alice DM &mdash; built for the table that never meets.</p>
@@ -1124,16 +1384,11 @@ function switchTab(tab) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
-    const btns = document.querySelectorAll('.nav-link');
-    btns.forEach(b => {
-        if ((tab === 'features' && b.textContent.trim() === 'Features') ||
-            (tab === 'architecture' && b.textContent.trim() === 'Architecture')) {
-            b.classList.add('active');
-        }
+    const labels = { features: 'Features', architecture: 'Architecture', team: 'The Team' };
+    document.querySelectorAll('.nav-link').forEach(b => {
+        if (b.textContent.trim() === labels[tab]) b.classList.add('active');
     });
-    if (tab === 'architecture' || tab === 'features') {
-        document.getElementById('nav').scrollIntoView({ behavior: 'smooth' });
-    }
+    document.getElementById('nav').scrollIntoView({ behavior: 'smooth' });
 }
 </script>
 
